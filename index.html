@@ -1,0 +1,309 @@
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-sans); }
+.cw {
+  padding: 1.25rem 0;
+  --s0: #3d5c3a;
+  --s1: #4e7048;
+  --s2: #6b8f63;
+  --s3: #8faa87;
+  --s4: #b8ccb4;
+  --s5: #dce8d9;
+  --s6: #edf4eb;
+  --blush: #f2ddd9; --lav: #e8e0f0; --sky: #d8eaf5; --butter: #f5f0d8; --mint: #d4ede5;
+}
+.hdr { text-align:center; margin-bottom:1.25rem; padding:1.25rem; background:var(--s6); border-radius:16px; border:1px solid var(--s5); }
+.hdr-title { font-size:19px; font-weight:500; color:var(--s0); margin-bottom:3px; letter-spacing:.3px; }
+.hdr-sub { font-size:12px; color:var(--s1); margin-bottom:14px; }
+.stats-row { display:flex; gap:8px; justify-content:center; margin-bottom:12px; flex-wrap:wrap; }
+.stat-pill { background:#fff; border:1px solid var(--s4); border-radius:99px; padding:4px 12px; font-size:11px; color:var(--s0); }
+.stat-pill span { font-weight:500; }
+.prog-outer { height:9px; background:var(--s5); border-radius:99px; overflow:hidden; margin:0 auto 5px; max-width:340px; }
+.prog-inner { height:100%; background:var(--s1); border-radius:99px; transition:width .4s ease; }
+.prog-label { font-size:11px; color:var(--s1); }
+
+.streak-banner { display:none; background:var(--s5); border:1px solid var(--s4); border-radius:12px; padding:8px 14px; margin-bottom:1rem; text-align:center; font-size:12px; color:var(--s0); }
+
+.badges-row { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin-bottom:1.25rem; }
+.badge { background:#fff; border:1px solid var(--s4); border-radius:10px; padding:7px 10px; text-align:center; font-size:10px; color:var(--s2); min-width:72px; transition:all .2s; }
+.badge.earned { background:var(--s5); border-color:var(--s2); color:var(--s0); }
+.badge-icon { font-size:16px; display:block; margin-bottom:2px; }
+.badge-name { display:block; font-size:10px; }
+
+.legend { display:flex; gap:7px; flex-wrap:wrap; justify-content:center; margin-bottom:1.25rem; }
+.leg { display:flex; align-items:center; gap:4px; font-size:11px; color:var(--s0); background:var(--s6); padding:3px 8px; border-radius:99px; border:1px solid var(--s5); }
+.ldot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+
+.cal-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(92px,1fr)); gap:6px; margin-bottom:1rem; }
+.dc { border-radius:12px; border:1px solid var(--s5); padding:8px 9px; cursor:pointer; min-height:78px; background:#fff; transition:border-color .15s; display:flex; flex-direction:column; gap:2px; }
+.dc:hover { border-color:var(--s3); }
+.dc.done { background:var(--s6); border-color:var(--s4); opacity:.75; }
+.dc.rest-s { background:var(--s6); }
+.dc.open { border-color:var(--s1); border-width:1.5px; }
+.dnum { font-size:10px; color:var(--s1); display:flex; align-items:center; gap:3px; }
+.today-pip { display:inline-block; width:5px; height:5px; border-radius:50%; background:var(--s1); }
+.ddate { font-size:10px; }
+.dsubj { font-size:11px; font-weight:500; margin-top:1px; }
+.dtopic { font-size:10px; line-height:1.35; flex:1; }
+.ddeco { font-size:9px; color:var(--s4); margin-top:2px; letter-spacing:.5px; }
+
+.panel { border-radius:14px; border:1.5px solid var(--s3); padding:1.25rem; margin-bottom:1rem; }
+.pan-hdr { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px; }
+.pan-title { font-size:14px; font-weight:500; }
+.pan-close { font-size:12px; color:var(--s2); cursor:pointer; padding:2px 6px; border-radius:6px; border:1px solid var(--s4); background:#fff; }
+.pan-close:hover { background:var(--s5); }
+.pan-date { font-size:11px; color:var(--s2); margin-bottom:8px; }
+.pan-topic { font-size:13px; margin-bottom:10px; line-height:1.5; }
+.steps { display:flex; flex-direction:column; gap:5px; margin-bottom:12px; }
+.step { background:var(--s6); border-radius:8px; border:1px solid var(--s5); padding:7px 10px; }
+.step-h { font-size:11px; font-weight:500; margin-bottom:2px; }
+.step-b { font-size:11px; line-height:1.55; }
+.pan-btns { display:flex; gap:7px; flex-wrap:wrap; }
+.pbtn { font-size:11px; padding:5px 13px; border-radius:99px; border:1px solid var(--s3); background:#fff; color:var(--s0); cursor:pointer; }
+.pbtn:hover { background:var(--s5); }
+.pbtn.active { background:var(--s5); border-color:var(--s1); }
+</style>
+
+<div class="cw">
+
+<div class="hdr">
+  <div class="hdr-title">.𖥔 ݁ ˖๋ ࣭ ⭑ igcse prep ⭑ ࣭ ˖๋ ݁ 𖥔.</div>
+  <div class="hdr-sub">mar 27 → apr 27 &nbsp;·&nbsp; 32 days &nbsp;·&nbsp; you've so got this ♡</div>
+  <div class="stats-row">
+    <div class="stat-pill">done <span id="st-done">0</span> / 32</div>
+    <div class="stat-pill">streak <span id="st-streak">0</span> days ✦</div>
+    <div class="stat-pill">days left <span id="st-left">32</span></div>
+  </div>
+  <div class="prog-outer"><div class="prog-inner" id="pbar" style="width:0%"></div></div>
+  <div class="prog-label" id="plabel">0% complete ˚</div>
+</div>
+
+<div class="streak-banner" id="streak-banner"></div>
+
+<div class="badges-row" id="badges-row"></div>
+
+<div class="legend">
+  <div class="leg"><div class="ldot" style="background:#5a7e52"></div>maths</div>
+  <div class="leg"><div class="ldot" style="background:#8a6e4e"></div>physics</div>
+  <div class="leg"><div class="ldot" style="background:#4e7a8a"></div>biology</div>
+  <div class="leg"><div class="ldot" style="background:#7a5a8a"></div>paper 6 / english</div>
+  <div class="leg"><div class="ldot" style="background:#6b8f63"></div>rest ˊˎ-</div>
+</div>
+
+<div id="panel-slot"></div>
+<div id="cal-grid" class="cal-grid"></div>
+
+</div>
+
+<script>
+var SS = {
+  "maths":    {dot:"#5a7e52",text:"#2e5228",bg:"#eaf3e7"},
+  "physics":  {dot:"#8a6e4e",text:"#5c3e24",bg:"#f5ece0"},
+  "biology":  {dot:"#4e7a8a",text:"#24505c",bg:"#e0edf5"},
+  "paper 6 / english":{dot:"#7a5a8a",text:"#4e2e5c",bg:"#ede0f5"},
+  "rest ˊˎ-": {dot:"#6b8f63",text:"#3d5c3a",bg:"#edf4eb"},
+};
+var DECOS=["˖๋ ࣭ ⭑","·˚ ༘","𖥔 ݁","˚ʚ♡ɞ˚","✦ ˚","⊹ ˚","✩ ˚","˖ ·˚","𓂃 ˖","☽ ˖","⋆ ˚","𖦹 ˚"];
+var DATES=[];
+for(var i=0;i<32;i++){var d=new Date(2026,2,27);d.setDate(27+i);DATES.push(d.toLocaleDateString('en-GB',{day:'numeric',month:'short'}));}
+
+var DAYS=[
+  {subj:"maths",topic:"number — types, hcf, lcm, primes & standard form"},
+  {subj:"physics",topic:"motion — speed, velocity, acceleration & distance-time graphs"},
+  {subj:"biology",topic:"characteristics & classification of living organisms"},
+  {subj:"maths",topic:"number — fractions, decimals, percentages, ratio & proportion"},
+  {subj:"physics",topic:"forces — newton's laws, friction & weight"},
+  {subj:"biology",topic:"cell structure & organisation"},
+  {subj:"maths",topic:"algebra — expressions, equations, inequalities & sequences"},
+  {subj:"rest ˊˎ-",topic:"rest or catch-up day ˚"},
+  {subj:"physics",topic:"pressure — solids, liquids & gas pressure"},
+  {subj:"biology",topic:"movement in & out of cells — diffusion, osmosis & active transport"},
+  {subj:"maths",topic:"algebra — simultaneous equations, quadratics & factorising"},
+  {subj:"physics",topic:"energy — forms, conservation, efficiency, work & power"},
+  {subj:"biology",topic:"biological molecules — carbohydrates, proteins, fats & water"},
+  {subj:"maths",topic:"algebra — functions, domain, range, inverse & composite"},
+  {subj:"physics",topic:"thermal physics — kinetic model, specific heat & latent heat"},
+  {subj:"biology",topic:"enzymes — action, factors affecting rate & inhibitors"},
+  {subj:"rest ˊˎ-",topic:"rest or catch-up day ˚"},
+  {subj:"maths",topic:"coordinate geometry — gradient, midpoint & straight line equations"},
+  {subj:"physics",topic:"thermal transfer — conduction, convection & radiation"},
+  {subj:"biology",topic:"plant nutrition — photosynthesis, limiting factors & minerals"},
+  {subj:"maths",topic:"graphs — quadratic, reciprocal, distance-time & speed-time curves"},
+  {subj:"physics",topic:"waves & sound — properties, transverse vs longitudinal & echo"},
+  {subj:"biology",topic:"human nutrition — diet, digestion, absorption & liver"},
+  {subj:"maths",topic:"geometry — angles, polygons, circle theorems & constructions"},
+  {subj:"physics",topic:"light & em spectrum — reflection, refraction & total internal reflection"},
+  {subj:"biology",topic:"respiration — aerobic & anaerobic, gas exchange in humans & plants"},
+  {subj:"rest ˊˎ-",topic:"rest or catch-up day ˚"},
+  {subj:"maths",topic:"mensuration & trigonometry — areas, volumes, sine & cosine rule"},
+  {subj:"physics",topic:"electricity — current, voltage, resistance, ohm's law & circuits"},
+  {subj:"biology",topic:"transport — xylem, phloem, transpiration, heart & blood vessels"},
+  {subj:"maths",topic:"transformations, vectors & matrices — extended content"},
+  {subj:"biology",topic:"diseases & immunity, excretion, coordination & hormones"},
+  {subj:"physics",topic:"magnetism, electromagnetism & radioactivity"},
+  {subj:"biology",topic:"reproduction, inheritance, variation, natural selection & ecosystems"},
+  {subj:"maths",topic:"statistics & probability — mean, histograms, tree diagrams & venn diagrams"},
+  {subj:"paper 6 / english",topic:"paper 6 practice — variables, method, results tables & graphs"},
+  {subj:"paper 6 / english",topic:"paper 6 mock + english language & literature light review"},
+  {subj:"rest ˊˎ-",topic:"full review — pick your 2 weakest topics & blurt them ˚"},
+  {subj:"rest ˊˎ-",topic:"rest day. you've earned every second of this ♡"},
+  {subj:"rest ˊˎ-",topic:"✦ exam day — apr 27 ✦ go get it."},
+];
+
+var STEPS={
+  "maths":[
+    {t:"0:00",h:"orient — 2 min",b:function(tp){return "write '"+tp+"' on paper. jot anything you already know — formulas, rules, examples. blank is completely fine ˚";}},
+    {t:"0:02",h:"input — 12 min",b:function(tp){return "search youtube: 'cognito maths "+tp+" igcse' or open your cgp extended maths guide to this topic. one source only — don't switch.";}},
+    {t:"0:14",h:"blurt — 5 min",b:function(){return "close everything. blank page. write every method, formula and rule you just learned from memory. messy is perfect actually.";}},
+    {t:"0:19",h:"practice qs — 9 min",b:function(tp){return "go to mathsgenie.co.uk → igcse → by topic → '"+tp+"'. do 2–4 questions then check the mark scheme.";}},
+    {t:"0:28",h:"wrap up — 2 min",b:function(tp){return "write one thing about '"+tp+"' that could trip you up. that's your flag. close everything. done ✦";}},
+  ],
+  "physics":[
+    {t:"0:00",h:"orient — 2 min",b:function(tp){return "write '"+tp+"' on paper. note any formulas or diagrams you remember. you're core — don't stress extended content.";}},
+    {t:"0:02",h:"watch cognito — 12 min",b:function(tp){return "search youtube: 'cognito "+tp+" igcse'. watch without pausing. no cognito? try 'freesciencelessons igcse "+tp+"'.";}},
+    {t:"0:14",h:"blurt — 5 min",b:function(){return "close the video. write everything — definitions, formulas, diagrams. physics core is heavily definition-based so practice clean one-liners.";}},
+    {t:"0:19",h:"practice qs — 9 min",b:function(tp){return "physicsandmathstutor.com → physics → igcse → by topic → '"+tp+"'. do 2–3 questions, check mark scheme after each.";}},
+    {t:"0:28",h:"wrap up — 2 min",b:function(tp){return "write the one key formula or definition for '"+tp+"' you'd need cold. done ˖๋ ✦";}},
+  ],
+  "biology":[
+    {t:"0:00",h:"orient — 2 min",b:function(tp){return "write '"+tp+"' and sketch any diagram you associate with it. biology is visual — even a rough blob counts ˚";}},
+    {t:"0:02",h:"watch cognito — 12 min",b:function(tp){return "search youtube: 'cognito "+tp+" igcse biology'. not there? try 'science with hazel "+tp+"'. watch without pausing.";}},
+    {t:"0:14",h:"draw & label — 5 min",b:function(){return "close everything. draw and label the main diagram from memory. wrong labels are fine — they show you exactly what to fix.";}},
+    {t:"0:19",h:"practice qs — 9 min",b:function(tp){return "physicsandmathstutor.com → biology → igcse → by topic → '"+tp+"'. do 2–3 questions, mark against the scheme immediately.";}},
+    {t:"0:28",h:"wrap up — 2 min",b:function(tp){return "write 3 keywords from '"+tp+"' you'd need in an exam answer. done ˚ʚ♡ɞ˚";}},
+  ],
+  "paper 6 / english":[
+    {t:"0:00",h:"orient — 2 min",b:function(){return "paper 6 has 4 question types every year: planning, data collection, analysis, evaluation. same format always — very learnable.";}},
+    {t:"0:02",h:"read a past paper — 10 min",b:function(){return "find a cie igcse biology paper 6 on pastpapers.papacambridge.com. read one full paper without answering — just get the feel.";}},
+    {t:"0:12",h:"attempt 2 questions — 10 min",b:function(){return "do questions 1 and 2. for any variable question: independent = what you change, dependent = what you measure, control = what stays same.";}},
+    {t:"0:22",h:"mark scheme — 6 min",b:function(){return "check answers against the mark scheme. same phrases come up every year — notice them and use them next time.";}},
+    {t:"0:28",h:"wrap up — 2 min",b:function(){return "write one phrase from the mark scheme you didn't use but should have. that's your paper 6 note. done ✦ ˚";}},
+  ],
+};
+
+var REST_MSG=[
+  "rest or catch-up. if you missed a session, now's the moment. if you're on track, genuinely rest — no guilt, it's built in on purpose ˖๋ ✦",
+  "rest or catch-up. no pressure today. your brain is consolidating everything you've studied this week — resting is literally doing work ˚",
+  "rest or catch-up. you're over halfway there. take this one easy ˚ʚ♡ɞ˚",
+  "pick the 2 topics that felt haziest across any subject. do a blurt for each — blank page, write everything from memory, then check your notes. no new content today.",
+  "rest day. you've earned every second of this. go outside, do something you love, eat something good. tomorrow is exam day and you are ready ♡",
+  "your exam is today. you have done the work. eat something, get there early, read every question fully before answering. you've genuinely got this ✦",
+];
+
+var BADGE_DEFS=[
+  {id:"b1",icon:"⭑",name:"first step",desc:"completed day 1",check:function(d){return d.has(0);}},
+  {id:"b3",icon:"♡",name:"3 in a row",desc:"3 day streak",check:function(d,streak){return streak>=3;}},
+  {id:"b7",icon:"𖥔",name:"one week",desc:"7 days done",check:function(d){return d.size>=7;}},
+  {id:"b14",icon:"✦",name:"halfway",desc:"14 days done",check:function(d){return d.size>=14;}},
+  {id:"b21",icon:"⊹",name:"21 days",desc:"habit formed",check:function(d){return d.size>=21;}},
+  {id:"b32",icon:"˚ʚ♡ɞ˚",name:"all done",desc:"32 days complete",check:function(d){return d.size>=32;}},
+];
+
+var done=(function(){try{return new Set(JSON.parse(localStorage.getItem('igcse_v4')||'[]'));}catch(e){return new Set();}})();
+function saveDone(){try{localStorage.setItem('igcse_v4',JSON.stringify(Array.from(done)));}catch(e){}}
+
+function calcStreak(){
+  var s=0;
+  for(var i=DAYS.length-1;i>=0;i--){
+    if(done.has(i)) s++; else break;
+  }
+  return s;
+}
+
+function updateStats(){
+  var n=done.size, streak=calcStreak(), left=32-n, pct=Math.round(n/32*100);
+  document.getElementById('st-done').textContent=n;
+  document.getElementById('st-streak').textContent=streak;
+  document.getElementById('st-left').textContent=left;
+  document.getElementById('pbar').style.width=pct+'%';
+  var msgs=["0% — let's go ˚","just getting started ˖๋","making moves ✦","quarter way there ⭑","keep going ♡","halfway!! ˚ʚ♡ɞ˚","over halfway, you're doing amazing ✦","almost there 𖥔","so close ⊹","done. you actually did it ˚ʚ♡ɞ˚"];
+  document.getElementById('plabel').textContent=pct+'% — '+msgs[Math.min(Math.floor(pct/11),9)];
+  var sb=document.getElementById('streak-banner');
+  if(streak>=3){sb.style.display='block';sb.textContent=streak+' day streak 𖥔 ˖ you\'re on a roll, don\'t stop now ✦';}
+  else sb.style.display='none';
+  renderBadges(streak);
+}
+
+function renderBadges(streak){
+  var row=document.getElementById('badges-row');
+  row.innerHTML='';
+  BADGE_DEFS.forEach(function(b){
+    var earned=b.check(done,streak);
+    var el=document.createElement('div');
+    el.className='badge'+(earned?' earned':'');
+    el.innerHTML='<span class="badge-icon">'+b.icon+'</span><span class="badge-name">'+b.name+'</span>';
+    el.title=b.desc+(earned?' — earned!':' — not yet');
+    row.appendChild(el);
+  });
+}
+
+var openIdx=-1;
+
+function closePanel(){
+  openIdx=-1;
+  var ps=document.getElementById('panel-slot');
+  ps.innerHTML='';
+  buildGrid();
+}
+
+function showDetail(i){
+  if(openIdx===i){closePanel();return;}
+  openIdx=i;
+  var day=DAYS[i],st=SS[day.subj],steps=STEPS[day.subj];
+  var isRest=day.subj==='rest ˊˎ-';
+  var restMsgs={8:REST_MSG[0],17:REST_MSG[1],27:REST_MSG[2],37:REST_MSG[3],38:REST_MSG[4],39:REST_MSG[5]};
+  var html='<div class="panel" style="background:'+st.bg+';border-color:'+st.dot+'">';
+  html+='<div class="pan-hdr"><div class="pan-title" style="color:'+st.text+'">'+DECOS[i%DECOS.length]+' day '+(i+1)+' — '+day.subj+'</div><button class="pan-close" onclick="closePanel()">close ×</button></div>';
+  html+='<div class="pan-date" style="color:'+st.dot+'">'+DATES[i]+'</div>';
+  html+='<div class="pan-topic" style="color:'+st.text+'">'+day.topic+'</div>';
+  if(isRest){
+    html+='<div class="step"><div class="step-b" style="font-size:12px;color:'+st.text+';line-height:1.6">'+(restMsgs[i]||REST_MSG[0])+'</div></div>';
+  } else if(steps){
+    html+='<div class="steps">';
+    steps.forEach(function(s){
+      var b=typeof s.b==='function'?s.b(day.topic):s.b;
+      html+='<div class="step"><div class="step-h" style="color:'+st.text+'">'+s.t+' &nbsp;'+s.h+'</div><div class="step-b" style="color:'+st.text+'cc">'+b+'</div></div>';
+    });
+    html+='</div>';
+  }
+  html+='<div class="pan-btns">';
+  html+='<button class="pbtn'+(done.has(i)?' active':'')+'" onclick="toggleDone('+i+')">'+(done.has(i)?'✓ done!':'mark as done')+'</button>';
+  if(!isRest) html+='<button class="pbtn" onclick="sendPrompt(\'quiz me on '+day.subj+' — '+day.topic.replace(/[\'\"]/g,'')+' using active recall, ask me one question at a time ↗\')">quiz me ↗</button>';
+  html+='</div></div>';
+  var ps=document.getElementById('panel-slot');
+  ps.innerHTML=html;
+  ps.scrollIntoView({behavior:'smooth',block:'nearest'});
+  buildGrid();
+}
+
+function toggleDone(i){
+  if(done.has(i)) done.delete(i); else done.add(i);
+  saveDone(); updateStats(); buildGrid();
+  if(openIdx===i) showDetail(i);
+}
+
+function buildGrid(){
+  var grid=document.getElementById('cal-grid');
+  grid.innerHTML='';
+  var now=new Date();
+  DAYS.forEach(function(day,i){
+    var st=SS[day.subj];
+    var d=new Date(2026,2,27); d.setDate(27+i);
+    var isToday=d.toDateString()===now.toDateString();
+    var card=document.createElement('div');
+    card.className='dc'+(done.has(i)?' done':'')+(day.subj==='rest ˊˎ-'?' rest-s':'')+(openIdx===i?' open':'');
+    card.style.borderColor=openIdx===i?st.dot:(done.has(i)?'#8faa87':st.dot+'44');
+    card.innerHTML=
+      '<div class="dnum" style="color:'+st.text+'">'+(isToday?'<span class="today-pip"></span>':'')+'day '+(i+1)+(done.has(i)?' ✓':'')+'</div>'+
+      '<div class="ddate" style="color:'+st.dot+'">'+DATES[i]+'</div>'+
+      '<div class="dsubj" style="color:'+st.text+'">'+day.subj+'</div>'+
+      '<div class="dtopic" style="color:'+st.text+'99">'+day.topic.substring(0,40)+(day.topic.length>40?'…':'')+'</div>'+
+      '<div class="ddeco">'+DECOS[i%DECOS.length]+'</div>';
+    card.addEventListener('click',function(){showDetail(i);});
+    grid.appendChild(card);
+  });
+}
+
+buildGrid();
+updateStats();
+</script>
